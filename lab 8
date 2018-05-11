@@ -1,0 +1,192 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Student
+{
+	friend class StudentList;
+
+private:
+	int id;  //id of a student.
+	string name;  //name of a student.
+	float cgpa;  //cgpa of a student.
+	Student *next; //address of the next available object.   
+	Student *prev; //address of the previous available object. 
+public:
+	Student(int id, string name, float cgpa, Student *next, Student *prev)
+	{
+		this->id = id;
+		this->name = name;
+		this->cgpa = cgpa;
+		this->next = next;
+		this->prev = prev;
+	}
+};
+
+class StudentList
+{
+private:
+	Student *head;
+	//start of the list
+
+	Student *cursor; //current item of the list
+	Student *last; //last item of the list 
+public:
+	StudentList()//default constructor
+	{
+		head = NULL;
+		cursor = NULL;
+		last = NULL;
+	}
+	void insert(Student &newStd)
+	{
+		if (!isEmpty())
+		{
+			newStd.next = cursor->next;
+			cursor->next = &newStd;
+			newStd.prev = cursor;
+			cursor = cursor->next;
+			if (cursor->next != NULL)
+			{
+				newStd.next->prev = &newStd;
+			}
+			if (cursor->next == NULL)
+			{
+				last = cursor;
+			}
+		}
+		else
+		{
+			head = &newStd;
+			cursor = head;
+			last = head;
+		}
+	}
+	void remove(int id)
+	{
+		Student* tempCur = head;
+		if (!isEmpty())
+		{
+			while (tempCur->next != NULL && tempCur->id != id )
+			{
+					tempCur = tempCur->next;
+			}
+			if ((tempCur == head) && (tempCur == last))
+			{
+				delete tempCur;
+				head = last = cursor = NULL;
+			}
+			else if (tempCur == head)
+			{
+				head = tempCur->next;
+				head->prev = NULL;
+				delete tempCur;
+			}
+			else if (tempCur == last)
+			{
+
+			}
+		}
+	}
+	void search(float cgpa);
+	void replace(const Student &newStd);
+	bool isEmpty() const
+	{
+		return (head == NULL);
+	}
+	void gotoBeginning()
+	{
+		if (!isEmpty())
+		{
+			cursor = head;
+		}
+	}
+	void gotoEnd()
+	{
+		if (!isEmpty())
+		{
+			if (cursor->next != NULL)
+			{
+				while (cursor->next!=NULL)
+				{
+					cursor = cursor->next;
+				}
+			}
+		}
+	}
+	bool gotoNext()
+	{
+		if (!isEmpty())
+		{
+			if (cursor->next != NULL)
+			{
+				cursor = cursor->next;
+				return true;
+			}
+		}
+
+		return false;
+	}
+	bool gotoPrior()
+	{
+		if (!isEmpty())
+		{
+			if (cursor->prev != NULL)
+			{
+				cursor = cursor->prev;
+				return true;
+			}
+		}
+
+		return false;
+	}
+	Student  getCursor()
+	{
+		if (!isEmpty())
+		{
+			return *cursor;
+		}
+	}
+	void showStructureForward()
+	{
+		if (!isEmpty())
+		{
+			gotoBeginning();
+			while (cursor  != NULL)
+			{
+				cout << "Id is : " << cursor->id << "\nName is : " << cursor->name << "\nCgpa is: " << cursor->cgpa << endl;
+				cursor = cursor->next;
+			}
+		}
+	}
+	void showStructureReverse()
+	{
+		if (!isEmpty())
+		{
+			gotoEnd();
+			while (cursor != NULL)
+			{
+				cout << "Id is : " << cursor->id << "\nName is : " << cursor->name << "\nCgpa is: " << cursor->cgpa << endl;
+				cursor = cursor->prev;
+			}
+		}
+	}
+
+	~StudentList() //destructor
+	{
+
+	}
+};
+void main()
+{
+	Student s1(1, "jawad", 3.79, NULL, NULL);
+	Student s2(2, "Shadab", 3.79, NULL, NULL);
+	Student s3(3, "bilal", 3.79, NULL, NULL);
+	StudentList list;
+	list.insert(s1);
+	list.insert(s2);
+	list.gotoBeginning();
+	list.insert(s3);
+	list.showStructureForward();
+	system("pause");
+}
