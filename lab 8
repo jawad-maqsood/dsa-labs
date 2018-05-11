@@ -40,15 +40,16 @@ public:
 	}
 	void insert(Student &newStd)
 	{
+		Student *temp = new Student(newStd.id,newStd.name,newStd.cgpa,NULL,NULL);
 		if (!isEmpty())
 		{
-			newStd.next = cursor->next;
-			cursor->next = &newStd;
-			newStd.prev = cursor;
+			temp->next = cursor->next;
+			cursor->next = temp;
+			temp->prev = cursor;
 			cursor = cursor->next;
 			if (cursor->next != NULL)
 			{
-				newStd.next->prev = &newStd;
+				temp->next->prev = &newStd;
 			}
 			if (cursor->next == NULL)
 			{
@@ -57,34 +58,44 @@ public:
 		}
 		else
 		{
-			head = &newStd;
+			head = temp;
 			cursor = head;
 			last = head;
 		}
 	}
 	void remove(int id)
 	{
-		Student* tempCur = head;
+		Student* temp = head;
 		if (!isEmpty())
 		{
-			while (tempCur->next != NULL && tempCur->id != id )
+			while (temp->id != id && temp->next != NULL)
 			{
-					tempCur = tempCur->next;
+					temp = temp->next;
 			}
-			if ((tempCur == head) && (tempCur == last))
+			if ((temp == head) && (temp->next == NULL))
 			{
-				delete tempCur;
+				delete temp;
 				head = last = cursor = NULL;
 			}
-			else if (tempCur == head)
+			else if (temp == head)
 			{
-				head = tempCur->next;
+				head = head->next;
 				head->prev = NULL;
-				delete tempCur;
+				delete temp;
 			}
-			else if (tempCur == last)
+			else if (temp->id == id)
 			{
+				temp->prev->next = temp->next;
+				if (temp->next != NULL)
+				{
+					temp->next->prev = temp->prev;
+				}
+				delete temp;
 
+			}
+			else
+			{
+				cout << "ID NOT FOUND " << endl;
 			}
 		}
 	}
@@ -154,8 +165,54 @@ public:
 			gotoBeginning();
 			while (cursor  != NULL)
 			{
-				cout << "Id is : " << cursor->id << "\nName is : " << cursor->name << "\nCgpa is: " << cursor->cgpa << endl;
+				cout << "Id is : " << cursor->id << "\nName is : " << cursor->name << "\nCgpa is: " << cursor->cgpa << endl << endl;;
 				cursor = cursor->next;
+			}
+		}
+	}
+
+	void Search(float cgpa) const
+	{
+		Student *cur = head;
+		if (isEmpty())
+		{
+			cout << "list is empty " << endl;
+		}
+		else
+		{
+			while (cur->cgpa != cgpa&&cur->next != NULL)
+			{
+				cur = cur->next;
+			}
+			if (cur->cgpa == cgpa)
+			{
+				cout << cur->id << "  " << cur->name << "  " << cur->cgpa << endl<<endl;
+			}
+			else{
+				cout << "no match found" << endl;
+			}
+		}
+	}
+
+	void update(float cgpa, int newid)
+	{
+		Student *cur = head;
+		if (isEmpty())
+		{
+			cout << "list is empty " << endl;
+		}
+		else
+		{
+			while (cur->cgpa != cgpa&&cur->next != NULL)
+			{
+				cur = cur->next;
+			}
+			if (cur->cgpa == cgpa)
+			{
+				cur->id = newid;
+			}
+			else{
+				cout << "no match found" << endl;
 			}
 		}
 	}
@@ -166,7 +223,7 @@ public:
 			gotoEnd();
 			while (cursor != NULL)
 			{
-				cout << "Id is : " << cursor->id << "\nName is : " << cursor->name << "\nCgpa is: " << cursor->cgpa << endl;
+				cout << "Id is : " << cursor->id << "\nName is : " << cursor->name << "\nCgpa is: " << cursor->cgpa << endl<<endl;
 				cursor = cursor->prev;
 			}
 		}
@@ -180,13 +237,16 @@ public:
 void main()
 {
 	Student s1(1, "jawad", 3.79, NULL, NULL);
-	Student s2(2, "Shadab", 3.79, NULL, NULL);
+	Student s2(2, "Shadab", 3.69, NULL, NULL);
 	Student s3(3, "bilal", 3.79, NULL, NULL);
 	StudentList list;
 	list.insert(s1);
 	list.insert(s2);
+	list.remove(1);
+	list.update(3.69,7);
 	list.gotoBeginning();
 	list.insert(s3);
+	list.showStructureForward();
 	list.showStructureForward();
 	system("pause");
 }
